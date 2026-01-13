@@ -1,0 +1,12 @@
+@import "tailwindcss";
+body {
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+@theme {
+  --background: #F7F9FC;
+  --cards: #FFFFFF;
+  --primary-text:
+  --secondary-text:
+  --a
+}
