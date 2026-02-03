@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sameBreed, getBreed, allDogs } from "../api/dog"
+import { sameBreed, getBreed, allDogs, testando } from "../api/dog"
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useFavorites } from "../context/FavoritesContext";
 import { toast } from "sonner";
@@ -13,11 +13,11 @@ export default function Input() {
   
   async function handleSearch(e: React.FormEvent) {
     e.preventDefault()
-    const url = await getBreed(input)
-    if(url === "")
-      return 
+    const url = await testando(input)
+    if(url === " ")
+      return
     setStatusImg(!statusImg)
-    setImg(url)
+    setImg(url.image)
   }
 
   async function handleSameBreed() {
