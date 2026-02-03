@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { sameBreed, getBreed, allDogs, testando } from "../api/dog"
+import { sameBreed, allDogs, testando } from "../api/dog"
 import { FaHeart, FaRegHeart } from "react-icons/fa";
 import { useFavorites } from "../context/FavoritesContext";
 import { toast } from "sonner";

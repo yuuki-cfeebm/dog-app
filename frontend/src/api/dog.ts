@@ -1,5 +1,3 @@
-import { SiAxios } from "react-icons/si"
-
 export async function getBreed(input: string) {
   const breed = input
   const res = await fetch(`${import.meta.env.VITE_API_URL}/breed/${breed}/images/random`)
