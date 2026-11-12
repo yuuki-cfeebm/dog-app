@@ -1,4 +1,6 @@
+import { FaTrash } from "react-icons/fa"
 import { useFavorites } from "../context/FavoritesContext"
+import { capitalize } from "../utils/text"
 
 interface DogCardProps {
   id: string,
@@ -6,22 +8,29 @@ interface DogCardProps {
   breed: string
 }
 
-
 export default function DogCard({ id, url, breed }: DogCardProps) {
-
   const { removeFavoriteDog } = useFavorites()
 
-  return(
-    <div id={id} className="flex flex-col justify-between items-center gap-6 p-4 rounded-xl bg-gray-200 w-[300px] h-[400px]">
-      <div className="flex flex-col items-center gap-4">
-        <img className="rounded-xl h-[250px] w-[250px] object-cover" src={url} alt={breed} />
-        <div className="font-bold text-xl">
-          <span>Raça: </span>
-          <span >{breed}</span>
-        </div>
+  return (
+    <div className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+      <div className="aspect-square overflow-hidden bg-stone-100">
+        <img
+          className="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+          src={url}
+          alt={breed}
+          loading="lazy"
+        />
       </div>
-      <div className="">
-        <button onClick={() => removeFavoriteDog(id)} className="bg-red-500 text-white p-2 rounded-md cursor-pointer">Remover</button>
+      <div className="flex items-center justify-between gap-2 p-4">
+        <span className="truncate font-bold">{capitalize(breed)}</span>
+        <button
+          onClick={() => removeFavoriteDog(id)}
+          aria-label={`Remover ${breed} dos favoritos`}
+          title="Remover"
+          className="cursor-pointer rounded-lg p-2 text-stone-400 transition hover:bg-red-50 hover:text-red-600"
+        >
+          <FaTrash />
+        </button>
       </div>
     </div>
   )
