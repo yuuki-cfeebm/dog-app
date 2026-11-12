@@ -1,6 +1,5 @@
 const BACKEND_URL = "http://localhost:3000"
 
-/** Lista de raças no formato "akita", "boston bulldog"... (sub-raça antes da raça, como o backend espera). */
 export async function allDogs(): Promise<string[]> {
   const res = await fetch(`${import.meta.env.VITE_API_URL}/breeds/list/all`)
   const data = await res.json()

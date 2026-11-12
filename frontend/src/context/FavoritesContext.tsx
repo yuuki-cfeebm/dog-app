@@ -32,14 +32,13 @@ export function FavoritesProvider({ children }: {children: ReactNode}) {
       img
     }
     setFavorites(prev => [...prev, newDog])
-    toast.success("Imagem salvada com sucesso!")
+    toast.success("Adicionado aos favoritos!")
 
   }
 
   function removeFavoriteDog(id: string) {
     setFavorites(prev => prev.filter(dog => dog.id !== id))
-    console.log("removeu", favorites)
-    toast.success("Imagem Removida com sucesso")
+    toast.success("Removido dos favoritos")
   }
 
   return(
