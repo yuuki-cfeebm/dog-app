@@ -1,25 +1,20 @@
-export async function getBreed(input: string) {
-  const breed = input
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/breed/${breed}/images/random`)
-  const data = await res.json()
-    return data.message
-}
+const BACKEND_URL = "http://localhost:3000"
 
-export async function sameBreed(input: string) {
-  const breed = input
-  const res = await fetch(`${import.meta.env.VITE_API_URL}/breed/${breed}/images/random`)
-  const data = await res.json()
-    return data.message
-}
-
-export async function allDogs() {
+/** Lista de raças no formato "akita", "boston bulldog"... (sub-raça antes da raça, como o backend espera). */
+export async function allDogs(): Promise<string[]> {
   const res = await fetch(`${import.meta.env.VITE_API_URL}/breeds/list/all`)
   const data = await res.json()
-    return data.message
+  const breeds = data.message as Record<string, string[]>
+
+  return Object.entries(breeds).flatMap(([breed, subs]) =>
+    subs.length ? subs.map(sub => `${sub} ${breed}`) : [breed]
+  )
 }
 
-export async function testando(input: string) {
-  const res = await fetch(`http://localhost:3000/dog/${input}`)
+export async function getDogImage(breed: string): Promise<string> {
+  const res = await fetch(`${BACKEND_URL}/dog/${encodeURIComponent(breed.trim().toLowerCase())}`)
+  if (!res.ok) throw new Error("Raça não encontrada")
   const data = await res.json()
-    return data
+  if (!data.image) throw new Error("Raça não encontrada")
+  return data.image
 }

@@ -1,81 +1,122 @@
-import { useEffect, useState } from "react";
-import { sameBreed, allDogs, testando } from "../api/dog"
-import { FaHeart, FaRegHeart } from "react-icons/fa";
-import { useFavorites } from "../context/FavoritesContext";
-import { toast } from "sonner";
+import { useEffect, useState } from "react"
+import { allDogs, getDogImage } from "../api/dog"
+import { FaHeart, FaRegHeart, FaRedo, FaDog } from "react-icons/fa"
+import BreedAutocomplete from "./BreedAutocomplete"
+import { useFavorites } from "../context/FavoritesContext"
+import { capitalize } from "../utils/text"
 
 export default function Input() {
-
   const [input, setInput] = useState("")
+  const [breed, setBreed] = useState("")       // raça da imagem exibida
   const [img, setImg] = useState<string | null>(null)
-  const [statusImg, setStatusImg] = useState(false)
-  
-  
-  async function handleSearch(e: React.FormEvent) {
-    e.preventDefault()
-    const url = await testando(input)
-    if(url === " ")
-      return
-    setStatusImg(!statusImg)
-    setImg(url.image)
-  }
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [breeds, setBreeds] = useState<string[]>([])
 
-  async function handleSameBreed() {
-    const url = await sameBreed(input)
-    setImg(url)
-  }
+  const { addFavoriteDog, removeFavoriteDog, favorites } = useFavorites()
+  const favorite = favorites.find(fav => fav.img === img)
 
-  const { addFavoriteDog, favorites } = useFavorites()
-  let isFavorite = favorites.some(fav => fav.img === img)
-  
-  function salvar() {
-    if(isFavorite)
-      return toast.error("Imagem ja foi salva!")
-    else {
-      if(!img) return
-      addFavoriteDog(input, img)
+  useEffect(() => {
+    allDogs().then(setBreeds).catch(() => setBreeds([]))
+  }, [])
+
+  async function load(target: string) {
+    setLoading(true)
+    setError(null)
+    try {
+      const url = await getDogImage(target)
+      setImg(url)
+      setBreed(target.trim().toLowerCase())
+    } catch {
+      setError(`Não encontramos a raça "${target}". Tente outra, como "akita" ou "golden retriever".`)
+    } finally {
+      setLoading(false)
     }
   }
 
-  useEffect(() => {
-    allDogs()
-  }, [])
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault()
+    if (!input.trim()) return
+    load(input)
+  }
 
-  return(
-    <div className="flex flex-col items-center w-full h-full gap-8">
-      <form onSubmit={handleSearch} className="flex w-1/3">
-        <input 
-          type="text" 
-          placeholder="ex: akita, pinscher..." 
+  function toggleFavorite() {
+    if (!img) return
+    if (favorite) removeFavoriteDog(favorite.id)
+    else addFavoriteDog(breed, img)
+  }
+
+  return (
+    <div className="mx-auto flex w-full max-w-2xl flex-col gap-6">
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <BreedAutocomplete
           value={input}
-          onChange={(e) => setInput(e.target.value)}
-          className="w-full p-3 bg-gray-100 rounded-md border-2 border-transparent focus:outline-none focus:border-sky-500"
-          />
+          onChange={setInput}
+          onSelect={load}
+          options={breeds}
+        />
+        <button
+          type="submit"
+          disabled={loading || !input.trim()}
+          className="cursor-pointer rounded-xl bg-brand-500 px-5 font-bold text-white shadow-sm transition hover:bg-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          Buscar
+        </button>
       </form>
-      <div className={`flex justify-center items-center rounded-2xl h-[600px] w-[800px] ${img ? "bg-none" : "bg-gray-300"}`}>
-        {img ?
-          (
-          <div className="flex flex-col gap-6 h-full">
-            <img src={img} alt="img-cachorro" className="h-full m-auto object-contain rounded-2xl shadow-lg"/>
-            <div className="w-[600px] m-auto flex items-center justify-around">
-              <button 
-                onClick={salvar}
-                className="cursor-pointer"
+
+      {error && (
+        <p className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </p>
+      )}
+
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+        <div className="relative flex aspect-[4/3] items-center justify-center bg-stone-100">
+          {img ? (
+            <img
+              src={img}
+              alt={`Foto de um ${breed}`}
+              className={`h-full w-full object-contain transition-opacity ${loading ? "opacity-40" : ""}`}
+            />
+          ) : (
+            <div className="flex flex-col items-center gap-3 text-stone-400">
+              <FaDog size={56} />
+              <span>Busque uma raça para ver uma foto</span>
+            </div>
+          )}
+          {loading && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="h-10 w-10 animate-spin rounded-full border-4 border-brand-100 border-t-brand-500" />
+            </div>
+          )}
+        </div>
+
+        {img && (
+          <div className="flex flex-wrap items-center justify-between gap-3 p-4">
+            <span className="text-lg font-bold">{capitalize(breed)}</span>
+            <div className="flex gap-2">
+              <button
+                onClick={toggleFavorite}
+                className={`flex cursor-pointer items-center gap-2 rounded-xl border px-4 py-2 font-semibold transition ${
+                  favorite
+                    ? "border-red-200 bg-red-50 text-red-600 hover:bg-red-100"
+                    : "border-stone-200 text-stone-700 hover:bg-stone-50"
+                }`}
               >
-                { isFavorite ? (<FaHeart color="red" size={30}/>) : (<FaRegHeart color="red" size={30}/>)}
+                {favorite ? <FaHeart className="text-red-500" /> : <FaRegHeart className="text-red-500" />}
+                {favorite ? "Favoritado" : "Favoritar"}
               </button>
-              <button 
-                onClick={handleSameBreed}
-                className="bg-yellow-500 hover:bg-yellow-600 transition-all text-white p-4 rounded-2xl cursor-pointer text-xl">
-                Gerar novamente
+              <button
+                onClick={() => load(breed)}
+                disabled={loading}
+                className="flex cursor-pointer items-center gap-2 rounded-xl bg-stone-900 px-4 py-2 font-semibold text-white transition hover:bg-stone-700 disabled:opacity-50"
+              >
+                <FaRedo size={12} /> Outra foto
               </button>
             </div>
-          </div>  
-          ) : (
-            <span className="text-center text-gray-500 text-2xl">Imagem aparece aqui...</span>
-          )}
+          </div>
+        )}
       </div>
     </div>
-      
   )
 }

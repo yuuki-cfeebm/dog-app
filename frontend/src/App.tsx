@@ -10,7 +10,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/favoritos" element={<FavoritesPage />} />
       </Routes>
-      <Toaster position="bottom-right" className="bg-red-400"/>
+      <Toaster position="bottom-right" richColors />
     </BrowserRouter>
   )
 }
