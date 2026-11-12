@@ -6,7 +6,7 @@ const app = express()
 app.use(cors())
 
 app.get('/dog/:raca', async (req, res) => {
-  let { raca } = req.params
+  let raca = req.params.raca.trim().toLowerCase()
   if(raca.includes(" ")){
     const partes = raca.toLowerCase().split(" ")
     raca = `${partes[1]}/${partes[0]}`
