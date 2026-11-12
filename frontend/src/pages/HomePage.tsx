@@ -1,11 +1,14 @@
-import Header from "../components/Header";
-import Input from "../components/Input";
-import Main from "../components/Main";
+import Header from "../components/Header"
+import Input from "../components/Input"
+import Main from "../components/Main"
 
 export default function HomePage() {
-  return(
+  return (
     <>
-      <Header titulo="Olá, seja Bem-vindo ao Dog App" texto="Digite no campo abaixo uma raça canina específica e uma foto aleatória será gerada"/>
+      <Header
+        titulo="Encontre o seu cachorro favorito"
+        texto="Digite uma raça e veja uma foto aleatória. Gostou? Salve nos favoritos."
+      />
       <Main>
         <Input />
       </Main>
